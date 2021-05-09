@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>图片转base64</title>
+  <title>图片转Ico</title>
   <link rel="stylesheet" href="//unpkg.com/element-ui@2.13.0/lib/theme-chalk/index.css">
   <script src="//cdn.jsdelivr.net/npm/vue@2.6.11"></script>
   <script src="//unpkg.com/element-ui@2.13.0/lib/index.js"></script>
@@ -11,22 +11,23 @@
     body {
       padding: 20px 50px;
     }
-    .code {
-      word-break: break-all;
+    .line {
+      display: flex;
+      align-items: center;
     }
-    .copyInput {
-      width: 1px;
-      height: 1px;
-      opacity: 0;
-      position: fixed;
-      top: 0;
-      left: 0;
+    .label {
+      padding-left: 20px;
     }
   </style>
 </head>
 <body>
   <div id="indexSPA">
     <h1>图片转Ico</h1>
+    <h3>尺寸：（最大100*100）</h3>
+    <div class="line">
+      <label class="label">宽：</label><el-input-number v-model="width" :min="1" :max="100" label="宽："></el-input-number>
+      <label class="label">高：</label><el-input-number v-model="height" :min="1" :max="100" label="高："></el-input-number>
+    </div>
     <h3>选择图片：(只能选择一张图片)</h3>
     <el-upload
       action="1"
@@ -40,7 +41,7 @@
       <i class="el-icon-plus"></i>
     </el-upload>
     
-    <canvas  ref="canvas" width="40" height="40" style="display: none;"></canvas>
+    <canvas  ref="canvas" :width="width" :height="height" style="display: none;"></canvas>
     <a ref="download" :href="downloadUrl" style="display: none;">下载按钮</a>
   </div>
 
@@ -49,7 +50,9 @@
       el: '#indexSPA',
       data: {
         files: [],
-        downloadUrl: ''
+        downloadUrl: '',
+        width: 32,
+        height: 32,
       },
       methods: {
         handleRemove: function() {
@@ -72,7 +75,7 @@
               var canvas = that.$refs.canvas;
               var ctx = canvas.getContext('2d');
               var a = that.$refs.download;
-              ctx.drawImage(this, 0, 0, 40, 40)
+              ctx.drawImage(this, 0, 0, that.width, that.height)
               canvas.toBlob(function(blob) {
                 var url = URL.createObjectURL(blob, 'image/x-icon');
                 that.downloadUrl = url;

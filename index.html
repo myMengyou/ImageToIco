@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>图片转base64</title>
+  <link rel="stylesheet" href="//unpkg.com/element-ui@2.13.0/lib/theme-chalk/index.css">
+  <script src="//cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+  <script src="//unpkg.com/element-ui@2.13.0/lib/index.js"></script>
+  <style>
+    body {
+      padding: 20px 50px;
+    }
+    .code {
+      word-break: break-all;
+    }
+    .copyInput {
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      position: fixed;
+      top: 0;
+      left: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="indexSPA">
+    <h1>图片转Ico</h1>
+    <h3>选择图片：(只能选择一张图片)</h3>
+    <el-upload
+      action="1"
+      accept="image/*"
+      :http-request="doUpload"
+      :on-change="doTransfer"
+      :on-remove="handleRemove"
+      list-type="picture-card"
+      :limit="1"
+      :file-list="files">
+      <i class="el-icon-plus"></i>
+    </el-upload>
+    
+    <canvas  ref="canvas" width="40" height="40" style="display: none;"></canvas>
+    <a ref="download" :href="downloadUrl" style="display: none;">下载按钮</a>
+  </div>
+
+  <script>
+    var app = new Vue({
+      el: '#indexSPA',
+      data: {
+        files: [],
+        downloadUrl: ''
+      },
+      methods: {
+        handleRemove: function() {
+          
+        },
+        doUpload: function() {
+
+        },
+        doTransfer: function(file, fileList) {
+          var that = this;
+          console.log('raw', file, file.raw)
+          if(file && file.raw) {
+            var reader = new FileReader();
+            reader.readAsDataURL(file.raw)
+            var image = new Image()
+            reader.onload = function() {
+              image.src = this.result;
+            }
+            image.onload = function() {
+              var canvas = that.$refs.canvas;
+              var ctx = canvas.getContext('2d');
+              var a = that.$refs.download;
+              ctx.drawImage(this, 0, 0, 40, 40)
+              canvas.toBlob(function(blob) {
+                var url = URL.createObjectURL(blob, 'image/x-icon');
+                that.downloadUrl = url;
+                a.setAttribute('download', Date.now()+'.ico');
+                a.click();
+                that.$message.success('请注意查看浏览器的下载目录')
+              })
+            }
+          }
+        },
+      }
+    });
+  </script>
+</body>
+</html>

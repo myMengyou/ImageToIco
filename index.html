@@ -11,23 +11,12 @@
     body {
       padding: 20px 50px;
     }
-    .line {
-      display: flex;
-      align-items: center;
-    }
-    .label {
-      padding-left: 20px;
-    }
   </style>
 </head>
 <body>
   <div id="indexSPA">
     <h1>图片转Ico</h1>
-    <h3>尺寸：（最大100*100）</h3>
-    <div class="line">
-      <label class="label">宽：</label><el-input-number v-model="width" :min="1" :max="100" label="宽："></el-input-number>
-      <label class="label">高：</label><el-input-number v-model="height" :min="1" :max="100" label="高："></el-input-number>
-    </div>
+    <h3>尺寸：<el-input-number v-model="size" :min="1" :max="100" label="尺寸"></el-input-number></h3>
     <h3>选择图片：(只能选择一张图片)</h3>
     <el-upload
       action="1"
@@ -41,8 +30,10 @@
       <i class="el-icon-plus"></i>
     </el-upload>
     
-    <canvas  ref="canvas" :width="width" :height="height" style="display: none;"></canvas>
+    <canvas  ref="canvas" :width="size" :height="size" style="display: none;"></canvas>
     <a ref="download" :href="downloadUrl" style="display: none;">下载按钮</a>
+    
+    <el-button v-if="downloadUrl" type="primary" @click="$refs.download.click()" style="margin-top: 20px;">保存Icon</el-button>
   </div>
 
   <script>
@@ -51,8 +42,7 @@
       data: {
         files: [],
         downloadUrl: '',
-        width: 32,
-        height: 32,
+        size: 32,
       },
       methods: {
         handleRemove: function() {
@@ -71,18 +61,30 @@
             reader.onload = function() {
               image.src = this.result;
             }
+            // function blobCallback(iconName) {
+            //   return function(b) {
+            //     var a = document.createElement("a");
+            //     a.textContent = "Download Icon";
+            //     document.body.appendChild(a);
+            //     a.style.display = "block";
+            //     a.download = iconName + ".ico";
+            //     a.href = window.URL.createObjectURL(b);
+            //   }
+            // }
             image.onload = function() {
               var canvas = that.$refs.canvas;
               var ctx = canvas.getContext('2d');
               var a = that.$refs.download;
-              ctx.drawImage(this, 0, 0, that.width, that.height)
+              ctx.drawImage(this, 0, 0, that.size, that.size)
               canvas.toBlob(function(blob) {
-                var url = URL.createObjectURL(blob, 'image/x-icon');
+                var url = URL.createObjectURL(blob);
                 that.downloadUrl = url;
                 a.setAttribute('download', Date.now()+'.ico');
-                a.click();
-                that.$message.success('请注意查看浏览器的下载目录')
-              })
+                // a.click();
+                // that.$message.success('请注意查看浏览器的下载目录')
+              }, 'image/vnd.microsoft.icon', '-moz-parse-options:format=bmp;bpp='+that.size)
+
+              // canvas.toBlob(blobCallback(Date.now()), 'image/vnd.microsoft.icon', '-moz-parse-options:format=bmp;bpp=32')
             }
           }
         },

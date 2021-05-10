@@ -16,7 +16,7 @@
 <body>
   <div id="indexSPA">
     <h1>图片转Ico</h1>
-    <h3>尺寸：<el-input-number v-model="size" :min="1" :max="100" label="尺寸"></el-input-number></h3>
+    <h3>尺寸：<el-input-number v-model="size" :min="1" :max="100" label="尺寸" @change="changeSize"></el-input-number></h3>
     <h3>选择图片：(只能选择一张图片)</h3>
     <el-upload
       action="1"
@@ -42,6 +42,7 @@
       data: {
         files: [],
         downloadUrl: '',
+        img: null,
         size: 32,
       },
       methods: {
@@ -50,6 +51,26 @@
         },
         doUpload: function() {
 
+        },
+        changeSize: function() {
+          if(this.downloadUrl) {
+            var that = this;
+            this.$nextTick(function() {
+              that.downloadUrl = '';
+              var canvas = that.$refs.canvas;
+              var ctx = canvas.getContext('2d');
+              var a = that.$refs.download;
+              // ctx.clearRect(0, 0, canvas.width, canvas.height);
+              ctx.drawImage(that.img, 0, 0, that.size, that.size)
+              canvas.toBlob(function(blob) {
+                var url = URL.createObjectURL(blob);
+                that.downloadUrl = url;
+                a.setAttribute('download', Date.now()+'.ico');
+                // a.click();
+                // that.$message.success('请注意查看浏览器的下载目录')
+              }, 'image/vnd.microsoft.icon', '-moz-parse-options:format=bmp;bpp='+that.size)
+            })
+          }
         },
         doTransfer: function(file, fileList) {
           var that = this;
@@ -72,6 +93,7 @@
             //   }
             // }
             image.onload = function() {
+              that.img = this;
               var canvas = that.$refs.canvas;
               var ctx = canvas.getContext('2d');
               var a = that.$refs.download;

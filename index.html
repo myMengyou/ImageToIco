@@ -16,7 +16,7 @@
 <body>
   <div id="indexSPA">
     <h1>图片转Ico</h1>
-    <h3>尺寸：<el-input-number v-model="size" :min="1" :max="100" label="尺寸" @change="changeSize"></el-input-number></h3>
+    <h3>尺寸：（最大为100）<el-input-number v-model="size" :min="1" :max="100" label="尺寸" @change="changeSize"></el-input-number></h3>
     <h3>选择图片：(只能选择一张图片)</h3>
     <el-upload
       action="1"
